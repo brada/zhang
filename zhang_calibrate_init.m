@@ -1,46 +1,37 @@
-% zero_skew: bool. True if you want to force the skew to zero. Note that this is
-% not necessarily a good idea. Even if the sensor is perfectly orthogonal, you
-% can still have nonzero skew if the sensor is not perfectly orthogonal to the
-% optical axis, which could happen with a slightly misaligned lens.
-% if centre_pp is true, the principle point will be initialised to the centre of
-% the image. if square_aspect is on, then fx and fy in A will be forced to be
-% equal.
-% Note that centre_pp does not enforce that constraint during the optimisation -
-% it only affects the initial guess. If false, then an estimate will be computed
-% via linear algebra.
-% first_order: bool. True if you want to use a first order radial distortion
-% model (ie only using the r^2 term). If false, a second order model will be
-% used (ie r^2 and r^4). Second order models more complicated lens distortion,
-% however the first order term dominates in most decent quality lenses, and so
-% including the second order term only leads to numerical instability. You can
-% see this by checking the confidence_interval after calibrating - the interval
-% corresponding to the second order interval could be much larger (as a
-% percentage of the magnitude of the actual value for that parameter) than the
-% others. If you set this to false, the k2 (r^4) term will be fixed to zero.
+% Solve for the initial guess
 %
-% The n* and delta* parameters are particular to the glass scanning
-% calibration protocol. They describe the number of 'free' calib images,
-% the number of images captured using a translation stage moving in deltaT
-% mm increments, and the number of images captured using the rotation stage
-% moving in deltaR degree increments. The images must be captured in that
-% order. deltaT and deltaR should always be positive, regardless of the
-% direction in which the planes are moved, because it refers to the
-% absolute delta between consecutive planes.
+% zero_skew [bool]: True if you want to force the skew to zero. For most
+% modern lenses the sensor axes are perfectly orthogonal, so it's
+% reasonable to impose zero skew. 
+% 
+% centre_pp [bool]: True to force the initial guess for the principle point
+% to be at the centre of the image. Note that if true, this constraint is
+% not enforced throughout the optimisation - it only affects the initial
+% guess. If false, an estimate will be computed automatically.
+%
+% square_aspect [bool]: Force horizontal and vertical focal lengths to be
+% equal.
+%
+% first_order [bool]: True if you want to use a first order radial
+% distortion model (ie only using the r^2 term). If false, a second order
+% model will be used (ie r^2 and r^4). Second-order models more complicated
+% lens distortion, however the first order term dominates in most decent
+% quality lenses, and so including the second order term can leads to
+% numerical instability. You can see this by checking the
+% confidence_interval after calibrating - the interval corresponding to the
+% second order interval could be much larger (as a percentage of the
+% magnitude of the actual value for that parameter) than the others. If you
+% set this to false, the k2 (r^4) term will be fixed to zero.
+%
 function Calibration = zhang_calibrate_init( calib, zero_skew, ...
                                              centre_pp, square_aspect, ...
-                                             first_order, nFree, nTStage, ...
-                                             nRStage, deltaT, deltaR )
+                                             first_order )
 
 Calibration = zhang_load( calib );
 Calibration.centre_pp = centre_pp;
 Calibration.zero_skew = zero_skew;
 Calibration.square_aspect = square_aspect;
 Calibration.first_order = first_order;
-Calibration.nFree = nFree;
-Calibration.nTStage = nTStage;
-Calibration.nRStage = nRStage;
-Calibration.deltaT = deltaT;
-Calibration.deltaR = deltaR;
 
 
 % helper function: build V matrix from H

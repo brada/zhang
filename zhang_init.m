@@ -1,5 +1,6 @@
-% load some images and create the calibration structure containing them. The
-% output_filename is optional
+% init calibration structure. This will copy the images into the .mat file
+% so be aware that it grow to a large size if you have many images
+% The output_filename is optional
 function Calibration = zhang_init( image_pattern, output_filename )
 
 
