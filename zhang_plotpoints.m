@@ -16,6 +16,7 @@ imshow( Calibration.Images(idx).Image );
 hold on;
 iPt = unhomo( Calibration.Images(idx).iPt );
 pPt = unhomo( Calibration.Images(idx).pPt );
+pPt = calib.N \ pPt; % bugfix reported by Ton ten Kate, 17 Feb 2011
 plot( iPt(1,:), iPt(2,:), 'r+' );
 plot( pPt(1,:), pPt(2,:), 'gO' );
 legend( 'detected image points', 'reprojected points' );

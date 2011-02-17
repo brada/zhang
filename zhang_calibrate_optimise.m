@@ -1,9 +1,19 @@
-% calls optimisation toolbox. set debug to true to output residual at each
-% iteration. set start_from_cur_soln true to begin optimising from the most
-% recent x stored in the calibration object (otherwise it will begin at x0, the
-% initial guess)
-function [Calibration,x] = zhang_calibrate_optimise( calib, debug, start_from_cur_soln )
+% calls optimisation toolbox to improve upon the initial guess x0 of the
+% calibration parameters, by minimising the reprojection error
+%
+% debug [bool]: True to output residual at each iteration. 
+%
+% start_from_cur_soln [bool]: True to begin optimising from the most
+% recent x stored in the calibration object (otherwise it will begin at x0,
+% the initial guess)
+%
+% maxiter [int]: maximum number of iterations to perform
+%
+function [Calibration,x] = zhang_calibrate_optimise( calib, debug, start_from_cur_soln, maxiter )
 
+if nargin < 4
+    maxiter = 100;
+end
 if nargin < 3
     start_from_cur_soln = false;
 end
@@ -26,7 +36,7 @@ if debug
 else
     diagnostics = 'off';
     plotfuncs   = [];
-    display     = 'final';
+    display     = 'off';
 end
 
 % form the sparsity pattern for the (nPoints x nParams) jacobian matrix. 
@@ -69,7 +79,7 @@ options = optimset( 'Algorithm','trust-region-reflective', ...
                     'PlotFcns', plotfuncs, ...
                     'TolX', 1e-12, ...
                     'TolFun', 1e-12, ...
-                    'MaxIter', 100, ...
+                    'MaxIter', maxiter, ...
                     'MaxFunEvals', 1000*length(x0), ...
                     'Display',display, ...
                     'TypicalX',x0 );
