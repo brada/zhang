@@ -18,7 +18,7 @@ for i = 1:length( Calibration.Images )
         I = Calibration.Images(i).Image;
         disp( ['running CALTag on ',Calibration.Images(i).Name] );
         [wPt,iPt] = caltag( I, CALTag_datafile, false );
-        if ~isempty( iPt )
+        if size( iPt, 1 ) > 4
             % want each point as a column
             iPt = iPt';
             wPt = wPt';
